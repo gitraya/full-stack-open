@@ -7,8 +7,8 @@ const Part = ({ name, exercises }) => (
 const Content = ({ parts }) => {
   return (
     <>
-      {parts.map(({ name, exercises }) => (
-        <Part name={name} exercises={exercises} />
+      {parts.map(({ name, exercises }, index) => (
+        <Part name={name} exercises={exercises} key={index} />
       ))}
     </>
   );
