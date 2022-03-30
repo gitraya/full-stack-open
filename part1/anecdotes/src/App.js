@@ -7,15 +7,13 @@ const Button = ({ onClick, text }) => (
   </button>
 );
 
-const Anecdote = ({ title, anecdote, vote }) => {
-  return (
-    <>
-      <Header title={title} />
-      <p>{anecdote}</p>
-      <p>{`has ${vote} vote${vote > 1 ? "s" : ""}`}</p>
-    </>
-  );
-};
+const Anecdote = ({ title, anecdote, vote }) => (
+  <>
+    <Header title={title} />
+    <p>{anecdote}</p>
+    <p>{`has ${vote} vote${vote > 1 ? "s" : ""}`}</p>
+  </>
+);
 
 const App = () => {
   const anecdotes = [
