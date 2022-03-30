@@ -7,16 +7,14 @@ const Button = ({ onClick, text }) => (
   </button>
 );
 
-const StatisticLine = ({ text, value }) => {
-  return (
-    <tr>
-      <td>{text}</td>
-      <td>
-        {value} {text === "positive" && value > 0 ? "%" : ""}
-      </td>
-    </tr>
-  );
-};
+const StatisticLine = ({ text, value }) => (
+  <tr>
+    <td>{text}</td>
+    <td>
+      {value} {text === "positive" && value > 0 ? "%" : ""}
+    </td>
+  </tr>
+);
 
 const Statistics = ({ feedbacks }) => {
   const feedbackScore = { good: 1, neutral: 0, bad: -1 };
