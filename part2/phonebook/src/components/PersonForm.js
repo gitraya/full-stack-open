@@ -1,7 +1,7 @@
 import { useState } from "react";
 import InputGroup from "./InputGroup";
 
-const PersonForm = ({ onSubmit, persons }) => {
+const PersonForm = ({ onSubmitPerson, persons }) => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
 
@@ -9,16 +9,23 @@ const PersonForm = ({ onSubmit, persons }) => {
   const handleNewNumberChange = (event) => setNewNumber(event.target.value);
   const handleAddPerson = (event) => {
     event.preventDefault();
-    const newPerson = { name: newName.trim(), number: newNumber.trim() };
-    if (!newPerson.name || !newPerson.number) return;
+    let personObject = { name: newName.trim(), number: newNumber.trim() };
+    if (!personObject.name || !personObject.number) return;
 
-    const personExists = persons.find(({ name }) => name === newPerson.name);
+    const personExists = persons.find(({ name }) => name === personObject.name);
+    let isUpdate = false;
     if (personExists) {
-      alert(`${newPerson.name} is already added to phonebook`);
-      return;
+      const confirmUpdate = window.confirm(
+        `${personObject.name} is already added to phonebook, replace the old number with a new one?`
+      );
+
+      if (!confirmUpdate) return;
+
+      personObject = { ...personExists, number: personObject.number };
+      isUpdate = confirmUpdate;
     }
 
-    onSubmit(newPerson);
+    onSubmitPerson(personObject, isUpdate);
     setNewName("");
     setNewNumber("");
   };
@@ -26,12 +33,14 @@ const PersonForm = ({ onSubmit, persons }) => {
   return (
     <form onSubmit={handleAddPerson}>
       <InputGroup
+        id="name"
         label="name:"
         type="text"
         value={newName}
         onChange={handleNewNameChange}
       />
       <InputGroup
+        id="number"
         label="number:"
         type="tel"
         value={newNumber}
