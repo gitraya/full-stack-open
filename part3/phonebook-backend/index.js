@@ -1,13 +1,15 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 const defaultPersons = require("./persons.json");
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const app = express();
 
 morgan.token("body", (req, res) =>
   req.method === "POST" ? JSON.stringify(req.body) : ""
 );
 
+app.use(cors());
 app.use(express.json());
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
