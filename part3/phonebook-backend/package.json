@@ -9,7 +9,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf build && cd ../../part2/phonebook && npm run build && cp -r build ../../part3/phonebook-backend",
     "deploy": "cd ../../ && git subtree push --prefix part3/phonebook-backend heroku main",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && cd ../../part3/phonebook-backend npm run deploy",
     "logs:prod": "heroku logs --tail"
   },
   "author": "Raya",
