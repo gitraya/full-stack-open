@@ -38,33 +38,32 @@ app.get("/info", (request, response) => {
 });
 
 app.get("/api/persons", async (request, response) => {
-  const persons = await Person.find({});
+  const persons = await Person.find({}).exec();
   response.json(persons);
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", async (request, response) => {
   const body = request.body;
 
   if (!body.name || !body.number) {
     return response.status(400).json({ error: "name or number missing" });
   }
 
-  const personExist = persons.find((person) => person.name === body.name);
+  const personExist = await Person.findOne({ name: body.name }).exec();
   if (personExist) {
     return response.status(400).json({ error: "name must be unique" });
   }
 
-  const person = {
-    id: generateId(persons),
+  const person = await Person.create({
     name: body.name,
     number: body.number,
-  };
-  persons = persons.concat(person);
+  });
+
   response.json(person);
 });
 
 app.get("/api/persons/:id", async (request, response) => {
-  const person = await Person.findById(request.params.id);
+  const person = await Person.findById(request.params.id).exec();
 
   if (!person) return response.status(404).end();
 
