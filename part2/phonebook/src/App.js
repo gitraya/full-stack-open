@@ -37,18 +37,15 @@ const App = () => {
           );
           setNewNotification(`Updated ${personObject.name}`, false);
         })
-        .catch((error) => {
-          setPersons(persons.filter((person) => person.id !== personObject.id));
-          setNewNotification(
-            `Information of ${personObject.name} has already been removed from server`,
-            true
-          );
-        });
+        .catch((error) => setNewNotification(error.response.data.error, true));
     } else {
       personService
         .create(personObject)
-        .then((returnedPerson) => setPersons(persons.concat(returnedPerson)));
-      setNewNotification(`Added ${personObject.name}`, false);
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setNewNotification(`Added ${personObject.name}`, false);
+        })
+        .catch((error) => setNewNotification(error.response.data.error, true));
     }
   };
 
