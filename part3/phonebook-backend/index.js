@@ -47,11 +47,6 @@ app.post("/api/persons", async (request, response, next) => {
   try {
     const { name, number } = request.body;
 
-    const personExist = await Person.findOne({ name }).exec();
-    if (personExist) {
-      return response.status(400).json({ error: "name must be unique" });
-    }
-
     const person = await Person.create({ name, number });
 
     response.json(person);

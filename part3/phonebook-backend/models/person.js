@@ -12,11 +12,23 @@ const personSchema = new mongoose.Schema({
   name: {
     type: String,
     minlength: 3,
-    required: true,
+    required: [true, "Name is required"],
+    validate: {
+      validator: async (name) => {
+        const person = await mongoose.models.Person.findOne({ name }).exec();
+        return Promise.resolve(!person);
+      },
+      message: "Name must be unique",
+    },
   },
   number: {
     type: String,
-    required: true,
+    minlength: 8,
+    required: [true, "Phone number is required"],
+    validate: {
+      validator: (v) => /^\d{2,3}-\d{5,}$/.test(v),
+      message: "{VALUE} is not a valid phone number!",
+    },
   },
 });
 
