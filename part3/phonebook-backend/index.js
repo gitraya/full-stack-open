@@ -30,8 +30,9 @@ const generateId = (data = []) => {
   return getRandomInt(maxId + 1, maxId + 1000);
 };
 
-app.get("/info", (request, response) => {
+app.get("/info", async (request, response) => {
   const date = new Date();
+  const persons = await Person.find({}).exec();
   const info = `<p>Phonebook has info for ${persons.length} people</p>
     <p>${date}</p>`;
   response.send(info);
