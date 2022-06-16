@@ -42,41 +42,65 @@ app.get("/api/persons", async (request, response) => {
   response.json(persons);
 });
 
-app.post("/api/persons", async (request, response) => {
-  const body = request.body;
+app.post("/api/persons", async (request, response, next) => {
+  try {
+    const body = request.body;
 
-  if (!body.name || !body.number) {
-    return response.status(400).json({ error: "name or number missing" });
+    if (!body.name || !body.number) {
+      return response.status(400).json({ error: "name or number missing" });
+    }
+
+    const personExist = await Person.findOne({ name: body.name }).exec();
+    if (personExist) {
+      return response.status(400).json({ error: "name must be unique" });
+    }
+
+    const person = await Person.create({
+      name: body.name,
+      number: body.number,
+    });
+
+    response.json(person);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/persons/:id", async (request, response, next) => {
+  try {
+    const person = await Person.findById(request.params.id).exec();
+
+    if (!person) return response.status(404).end();
+
+    response.json(person);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete("/api/persons/:id", async (request, response, next) => {
+  try {
+    const person = await Person.findByIdAndRemove(request.params.id).exec();
+
+    if (!person) return response.status(404).end();
+
+    response.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
   }
 
-  const personExist = await Person.findOne({ name: body.name }).exec();
-  if (personExist) {
-    return response.status(400).json({ error: "name must be unique" });
-  }
+  next(error);
+};
 
-  const person = await Person.create({
-    name: body.name,
-    number: body.number,
-  });
-
-  response.json(person);
-});
-
-app.get("/api/persons/:id", async (request, response) => {
-  const person = await Person.findById(request.params.id).exec();
-
-  if (!person) return response.status(404).end();
-
-  response.json(person);
-});
-
-app.delete("/api/persons/:id", async (request, response) => {
-  const person = await Person.findByIdAndRemove(request.params.id).exec();
-
-  if (!person) return response.status(404).end();
-
-  response.status(204).end();
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
