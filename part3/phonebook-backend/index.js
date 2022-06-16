@@ -70,9 +70,10 @@ app.get("/api/persons/:id", async (request, response) => {
   response.json(person);
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((person) => person.id !== id);
+app.delete("/api/persons/:id", async (request, response) => {
+  const person = await Person.findByIdAndRemove(request.params.id).exec();
+
+  if (!person) return response.status(404).end();
 
   response.status(204).end();
 });
