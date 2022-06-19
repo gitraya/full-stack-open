@@ -3,10 +3,9 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const Person = require("./models/person");
-const defaultPersons = require("./persons.json");
 const app = express();
 
-morgan.token("body", (req, res) =>
+morgan.token("body", (req) =>
   req.method === "POST" ? JSON.stringify(req.body) : ""
 );
 
@@ -16,19 +15,6 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 app.use(express.static("build"));
-
-let persons = defaultPersons;
-
-const getRandomInt = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min);
-};
-
-const generateId = (data = []) => {
-  const maxId = data.length > 0 ? Math.max(...data.map((n) => n.id)) : 0;
-  return getRandomInt(maxId + 1, maxId + 1000);
-};
 
 app.get("/info", async (request, response) => {
   const date = new Date();
