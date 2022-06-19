@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 const url = process.env.MONGODB_URI;
 
 console.log("connecting to", url);
@@ -13,13 +14,7 @@ const personSchema = new mongoose.Schema({
     type: String,
     minlength: 3,
     required: [true, "Name is required"],
-    validate: {
-      validator: async (name) => {
-        const person = await mongoose.models.Person.findOne({ name }).exec();
-        return Promise.resolve(!person);
-      },
-      message: "Name must be unique",
-    },
+    unique: true,
   },
   number: {
     type: String,
@@ -39,5 +34,7 @@ personSchema.set("toJSON", {
     delete returnedObject.__v;
   },
 });
+
+personSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("Person", personSchema);
