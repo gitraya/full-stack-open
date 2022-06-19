@@ -9,11 +9,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf build && cd ../../part2/phonebook && npm run build && cp -r build ../../part3/phonebook-backend",
     "deploy": "cd ../../ && git subtree push --prefix part3/phonebook-backend heroku main",
-    "logs:prod": "heroku logs --tail"
+    "logs:prod": "heroku logs --tail",
+    "lint": "eslint ."
   },
   "author": "Raya",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^8.18.0",
     "nodemon": "^2.0.15"
   },
   "dependencies": {
