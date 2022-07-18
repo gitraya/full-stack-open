@@ -6,6 +6,8 @@ const helper = require("./test_helper");
 
 const api = supertest(app);
 
+jest.setTimeout(10000);
+
 beforeEach(async () => {
   await Blog.deleteMany({});
   console.log("cleared blogs");
@@ -23,7 +25,7 @@ test("blogs are retuned as json", async () => {
     .get("/api/blogs")
     .expect(200)
     .expect("Content-Type", /application\/json/);
-}, 100000);
+});
 
 test("there are six blogs", async () => {
   const response = await api.get("/api/blogs");
@@ -36,6 +38,12 @@ test("the first blog is about React patterns", async () => {
 
   const titles = response.body.map((r) => r.title);
   expect(titles).toContain(helper.initialBlogs[0].title);
+});
+
+test("every blogs must have an id", async () => {
+  const response = await api.get("/api/blogs");
+
+  response.body.forEach((b) => expect(b.id).toBeDefined());
 });
 
 afterAll(() => mongoose.connection.close());
