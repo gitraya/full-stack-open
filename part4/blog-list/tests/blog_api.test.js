@@ -36,14 +36,35 @@ test("there are six blogs", async () => {
 test("the first blog is about React patterns", async () => {
   const response = await api.get("/api/blogs");
 
-  const titles = response.body.map((r) => r.title);
-  expect(titles).toContain(helper.initialBlogs[0].title);
+  const urls = response.body.map((r) => r.url);
+  expect(urls).toContain(helper.initialBlogs[0].url);
 });
 
 test("every blogs must have an id", async () => {
   const response = await api.get("/api/blogs");
 
   response.body.forEach((b) => expect(b.id).toBeDefined());
+});
+
+test("a valid blog can be added", async () => {
+  const newBlog = {
+    title: "How to Find Your First Job in Tech? (in 2022)",
+    author: "Cem Eygi",
+    url: "https://medium.com/thedevproject/how-to-find-your-first-job-in-tech-in-2022-43e8a18725b5",
+    likes: 9,
+  };
+
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
+
+  const urls = blogsAtEnd.map((n) => n.url);
+  expect(urls).toContain(newBlog.url);
 });
 
 afterAll(() => mongoose.connection.close());
