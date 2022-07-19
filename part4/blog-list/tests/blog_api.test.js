@@ -72,12 +72,22 @@ test("a blog without likes is set to 0", async () => {
     title: "How to Find Your First Job in Tech? (in 2022)",
     author: "Cem Eygi",
     url: "https://medium.com/thedevproject/how-to-find-your-first-job-in-tech-in-2022-43e8a18725b5",
-  }
+  };
 
-  await api.post('/api/blogs').send(newBlog).expect(201).expect('Content-Type', /application\/json/);
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
 
   const blogsAtEnd = await helper.blogsInDb();
   expect(blogsAtEnd[helper.initialBlogs.length].likes).toBe(0);
-})
+});
+
+test("a blog without title and url is not added", async () => {
+  const newBlog = { author: "Cem Eygi" };
+
+  await api.post("/api/blogs").send(newBlog).expect(400);
+});
 
 afterAll(() => mongoose.connection.close());
