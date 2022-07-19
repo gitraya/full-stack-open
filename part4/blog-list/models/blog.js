@@ -9,8 +9,18 @@ const blogSchema = new mongoose.Schema({
   url: {
     type: String,
     required: true,
+    validate: {
+      validator: (v) =>
+        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(
+          v
+        ),
+      message: "{VALUE} is not a valid url!",
+    },
   },
-  likes: Number,
+  likes: {
+    type: Number,
+    default: 0,
+  },
 });
 
 blogSchema.set("toJSON", {

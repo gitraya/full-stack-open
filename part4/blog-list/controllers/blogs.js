@@ -7,15 +7,20 @@ blogsRouter.get("/", async (request, response) => {
 });
 
 blogsRouter.post("/", async (request, response) => {
-  const blog = new Blog({
-    title: request.body.title,
-    author: request.body.author,
-    url: request.body.url,
-    likes: request.body.likes || 0,
-  });
+  const blog = new Blog(request.body);
 
   const result = await blog.save();
   response.status(201).json(result);
+});
+
+blogsRouter.put("/:id", async (request, response) => {
+  const result = await Blog.findByIdAndUpdate(request.params.id, request.body, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  });
+
+  response.json(result);
 });
 
 blogsRouter.delete("/:id", async (request, response) => {
