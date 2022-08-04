@@ -24,8 +24,25 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
+const passwordValidator = (request, response, next) => {
+  const password = request.body.password;
+
+  if (!password) {
+    return response.status(400).json({ error: "Password is required" });
+  }
+
+  if (password.length < 3) {
+    return response
+      .status(400)
+      .json({ error: "Password must be at least 3 characters long" });
+  }
+
+  next();
+};
+
 module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  passwordValidator,
 };

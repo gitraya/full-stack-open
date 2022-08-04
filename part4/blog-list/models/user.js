@@ -1,9 +1,21 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const userSchema = new mongoose.Schema({
-  username: String,
-  name: String,
-  passwordHash: String,
+  username: {
+    type: String,
+    required: [true, "Username is required"],
+    unique: true,
+    minlength: 3,
+  },
+  name: {
+    type: String,
+    minlength: 3,
+  },
+  passwordHash: {
+    type: String,
+    required: true,
+  },
 });
 
 userSchema.set("toJSON", {
@@ -15,5 +27,7 @@ userSchema.set("toJSON", {
     delete returnedObject.passwordHash;
   },
 });
+
+userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("User", userSchema);
