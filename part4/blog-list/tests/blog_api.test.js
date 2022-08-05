@@ -1,7 +1,9 @@
+const bcrypt = require("bcrypt");
 const supertest = require("supertest");
 const mongoose = require("mongoose");
 const app = require("../app");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 const helper = require("./test_helper");
 
 const api = supertest(app);
@@ -9,16 +11,23 @@ const api = supertest(app);
 jest.setTimeout(10000);
 
 beforeEach(async () => {
+  await User.deleteMany({});
   await Blog.deleteMany({});
-  console.log("cleared blogs");
-  await Blog.insertMany(helper.initialBlogs);
-  console.log("added blogs");
+
+  const passwordHash = await bcrypt.hash("sekret", 10);
+  const user = new User({ username: "root", passwordHash });
+
+  const initialBlogs = helper.initialBlogs.map((blog) => ({
+    ...blog,
+    user: user._id,
+  }));
+
+  await Blog.insertMany(initialBlogs);
+  await user.save();
 });
 
 describe("when there is initially some notes saved", () => {
   test("blogs are retuned as json", async () => {
-    console.log("entered test");
-
     await api
       .get("/api/blogs")
       .expect(200)
@@ -46,16 +55,17 @@ describe("when there is initially some notes saved", () => {
 });
 
 describe("addition of a new blog", () => {
-  test("a valid blog can be added", async () => {
-    const newBlog = {
-      title: "How to Find Your First Job in Tech? (in 2022)",
-      author: "Cem Eygi",
-      url: "https://medium.com/thedevproject/how-to-find-your-first-job-in-tech-in-2022-43e8a18725b5",
-      likes: 9,
-    };
+  const newBlog = {
+    title: "How to Find Your First Job in Tech? (in 2022)",
+    author: "Cem Eygi",
+    url: "https://medium.com/thedevproject/how-to-find-your-first-job-in-tech-in-2022-43e8a18725b5",
+    likes: 9,
+  };
 
+  test("a valid blog can be added", async () => {
     await api
       .post("/api/blogs")
+      .set("Authorization", `bearer ${await helper.getToken()}`)
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -68,14 +78,11 @@ describe("addition of a new blog", () => {
   });
 
   test("a blog without likes is set to 0", async () => {
-    const newBlog = {
-      title: "How to Find Your First Job in Tech? (in 2022)",
-      author: "Cem Eygi",
-      url: "https://medium.com/thedevproject/how-to-find-your-first-job-in-tech-in-2022-43e8a18725b5",
-    };
+    delete newBlog.likes;
 
     await api
       .post("/api/blogs")
+      .set("Authorization", `bearer ${await helper.getToken()}`)
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -85,24 +92,38 @@ describe("addition of a new blog", () => {
   });
 
   test("a blog without title and url is not added", async () => {
-    const newBlog = { author: "Cem Eygi" };
+    delete newBlog.title;
+    delete newBlog.url;
 
-    await api.post("/api/blogs").send(newBlog).expect(400);
+    await api
+      .post("/api/blogs")
+      .set("Authorization", `bearer ${await helper.getToken()}`)
+      .send(newBlog)
+      .expect(400);
+  });
+
+  test("fails with status code 401 if token is missing", async () => {
+    const result = await api.post("/api/blogs").send(newBlog).expect(401);
+
+    expect(result.body.error).toContain("token");
   });
 });
 
 describe("editing a blog", () => {
+  const updatedBlog = {
+    title: "11 Amazing New JavaScript Features in ES13",
+    author: "Code Beauty",
+    url: "https://medium.com/javascript-in-plain-english/es13-javascript-features-eed7ed2f1497",
+    likes: 670,
+  };
+
   test("succeeds with status code 200 if blog is valid", async () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogToUpdate = blogsAtStart[0];
 
-    const updatedBlog = {
-      title: "How to Find Your First Job in Tech? (in 2022)",
-      likes: 9,
-    };
-
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
+      .set("Authorization", `bearer ${await helper.getToken()}`)
       .send(updatedBlog)
       .expect(200)
       .expect("Content-Type", /application\/json/);
@@ -112,7 +133,10 @@ describe("editing a blog", () => {
   });
 
   test("fails with status code 400 if id is invalid", async () => {
-    await api.put("/api/blogs/1").expect(400);
+    await api
+      .put("/api/blogs/1")
+      .set("Authorization", `bearer ${await helper.getToken()}`)
+      .expect(400);
   });
 
   test("fails with status code 400 if url is invalid", async () => {
@@ -123,11 +147,24 @@ describe("editing a blog", () => {
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
+      .set("Authorization", `bearer ${await helper.getToken()}`)
       .send(updatedBlog)
       .expect(400);
 
     const blogsAtEnd = await helper.blogsInDb();
     expect(blogsAtEnd[0].url).toEqual(blogToUpdate.url);
+  });
+
+  test("fails with status code 401 if token is missing", async () => {
+    const blogsAtStart = await helper.blogsInDb();
+    const blogToUpdate = blogsAtStart[0];
+
+    const result = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updatedBlog)
+      .expect(401);
+
+    expect(result.body.error).toContain("token");
   });
 });
 
@@ -136,7 +173,10 @@ describe("deletion of a blog", () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogToDelete = blogsAtStart[0];
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set("Authorization", `bearer ${await helper.getToken()}`)
+      .expect(204);
 
     const blogsAtEnd = await helper.blogsInDb();
 
@@ -147,7 +187,21 @@ describe("deletion of a blog", () => {
   });
 
   test("fails with status code 400 if id is invalid", async () => {
-    await api.delete(`/api/blogs/1`).expect(400);
+    await api
+      .delete(`/api/blogs/1`)
+      .set("Authorization", `bearer ${await helper.getToken()}`)
+      .expect(400);
+  });
+
+  test("fails with status code 401 if token is missing", async () => {
+    const blogsAtStart = await helper.blogsInDb();
+    const blogToDelete = blogsAtStart[0];
+
+    const result = await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(401);
+
+    expect(result.body.error).toContain("token");
   });
 });
 
