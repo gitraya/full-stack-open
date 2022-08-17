@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const Blog = ({ blog, onLike, onRemove }) => {
   const user = JSON.parse(
@@ -52,6 +53,12 @@ const Blog = ({ blog, onLike, onRemove }) => {
       )}
     </div>
   );
+};
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  onLike: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
 };
 
 export default Blog;
