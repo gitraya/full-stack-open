@@ -16,4 +16,15 @@ const create = async (newObject) => {
   return response.data;
 };
 
-export default { getAll, create, setToken };
+const remove = async (id) => {
+  const config = { headers: { Authorization: token } };
+  await axios.delete(`${baseUrl}/${id}`, config);
+};
+
+const updateLike = async (id) => {
+  const config = { headers: { Authorization: token } };
+  const response = await axios.put(`${baseUrl}/${id}/like`, null, config);
+  return response.data;
+};
+
+export default { getAll, create, remove, setToken, updateLike };

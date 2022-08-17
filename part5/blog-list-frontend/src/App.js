@@ -1,16 +1,17 @@
 import "./index.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import blogService from "./services/blogs";
 import Blog from "./components/Blog";
 import BlogForm from "./components/Forms/Blog";
 import LoginForm from "./components/Forms/Login";
 import Notification from "./components/Notification";
-import blogService from "./services/blogs";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-
   const [user, setUser] = useState(null);
   const [notification, setNotification] = useState(null);
+  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -31,12 +32,69 @@ const App = () => {
     }, 5000);
   }, [notification]);
 
-  const onUpdateBlogs = (newBlog) =>
-    setBlogs((initialBlogs) => [...initialBlogs, newBlog]);
-
   const handleLogout = () => {
     window.localStorage.removeItem("loggedBlogappUser");
     window.location.reload();
+  };
+
+  const onCreateBlog = async ({ title, author, url }) => {
+    try {
+      const newBlog = await blogService.create({ title, author, url });
+
+      setBlogs((initialBlogs) => [...initialBlogs, newBlog]);
+
+      setNotification({
+        message: `a new blog ${title} by ${author} added`,
+        type: "success",
+      });
+
+      blogFormRef.current.toggleVisibility();
+    } catch (exception) {
+      setNotification({
+        message: "failed to add a new blog",
+        type: "error",
+      });
+    }
+  };
+
+  const onLikeBlog = async (blog) => {
+    try {
+      const updatedBlog = await blogService.updateLike(blog.id);
+      setBlogs((initialBlogs) =>
+        initialBlogs.map((b) => (b.id === blog.id ? updatedBlog : b))
+      );
+
+      setNotification({
+        message: `liked blog ${blog.title} by ${blog.author}`,
+        type: "success",
+      });
+    } catch (exception) {
+      setNotification({
+        message: `failed to like blog ${blog.title}`,
+        type: "error",
+      });
+    }
+  };
+
+  const onRemoveBlog = async (blog) => {
+    if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      return;
+    }
+
+    try {
+      await blogService.remove(blog.id);
+      setBlogs((initialBlogs) => initialBlogs.filter((b) => b.id !== blog.id));
+
+      setNotification({
+        message: `removed blog ${blog.title} by ${blog.author}`,
+        type: "success",
+      });
+    } catch (exception) {
+      setNotification({
+        message: `failed to remove blog ${blog.title}`,
+        type: "error",
+      });
+    }
   };
 
   if (!user) {
@@ -60,13 +118,17 @@ const App = () => {
         {user.name} logged in <button onClick={handleLogout}>logout</button>
       </p>
 
-      <BlogForm
-        onUpdateBlogs={onUpdateBlogs}
-        setNotification={setNotification}
-      />
+      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+        <BlogForm onCreate={onCreateBlog} />
+      </Togglable>
 
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          onLike={onLikeBlog}
+          onRemove={onRemoveBlog}
+        />
       ))}
     </div>
   );
