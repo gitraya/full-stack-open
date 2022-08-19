@@ -25,7 +25,7 @@ const BlogForm = ({ onCreate }) => {
           required
           type="title"
           value={title}
-          name="Title"
+          name="title"
           onChange={({ target }) => setTitle(target.value)}
         />
       </div>
@@ -35,7 +35,7 @@ const BlogForm = ({ onCreate }) => {
           required
           type="author"
           value={author}
-          name="Author"
+          name="author"
           onChange={({ target }) => setAuthor(target.value)}
         />
       </div>
@@ -45,7 +45,7 @@ const BlogForm = ({ onCreate }) => {
           required
           type="url"
           value={url}
-          name="Url"
+          name="url"
           onChange={({ target }) => setUrl(target.value)}
         />
       </div>

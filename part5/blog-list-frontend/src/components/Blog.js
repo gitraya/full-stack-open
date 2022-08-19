@@ -2,9 +2,8 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 
 const Blog = ({ blog, onLike, onRemove }) => {
-  const user = JSON.parse(
-    window.localStorage.getItem("loggedBlogappUser") || ""
-  );
+  const loggedUser = window.localStorage.getItem("loggedBlogappUser");
+  const user = loggedUser ? JSON.parse(loggedUser) : null;
 
   const [visible, setVisible] = useState(false);
   const isBlogOwned = user?.id === blog?.user?.id;
@@ -23,6 +22,10 @@ const Blog = ({ blog, onLike, onRemove }) => {
     color: "white",
     width: "min-content",
   };
+  const parentDetailStyle = {
+    display: "flex",
+    flexDirection: "column",
+  };
 
   const toggleVisibility = () => setVisible(!visible);
 
@@ -36,7 +39,7 @@ const Blog = ({ blog, onLike, onRemove }) => {
         <button onClick={toggleVisibility}>{visible ? "hide" : "view"}</button>
       </span>
       {visible && (
-        <>
+        <div data-testid="blog-detail" style={parentDetailStyle}>
           <a href={blog.url} target="_blank" rel="noreferrer">
             {blog.url}
           </a>
@@ -49,7 +52,7 @@ const Blog = ({ blog, onLike, onRemove }) => {
               remove
             </button>
           )}
-        </>
+        </div>
       )}
     </div>
   );
