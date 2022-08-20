@@ -19,7 +19,9 @@ test("<BlogForm/> updates parent state and calls onSubmit", async () => {
   const createButton = screen.getByText("create");
 
   inputs.forEach((input) =>
-    fireEvent.change(input, { target: { value: fields[input.name] } })
+    fireEvent.change(input, {
+      target: { value: fields[input.name.toLowerCase()] },
+    })
   );
 
   await user.click(createButton);

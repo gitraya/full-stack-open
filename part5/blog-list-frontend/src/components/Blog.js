@@ -33,7 +33,7 @@ const Blog = ({ blog, onLike, onRemove }) => {
   const handleRemove = () => onRemove(blog);
 
   return (
-    <div style={blogStyle}>
+    <div data-testid="blog-card" style={blogStyle}>
       <span>
         {blog.title} {blog.author}{" "}
         <button onClick={toggleVisibility}>{visible ? "hide" : "view"}</button>
