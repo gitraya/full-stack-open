@@ -1,14 +1,27 @@
-const Notification = () => {
-  const style = {
-    border: 'solid',
-    padding: 10,
-    borderWidth: 1
-  }
-  return (
-    <div style={style}>
-      render here notification...
-    </div>
-  )
-}
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { removeNotification } from "../reducers/notificationReducer";
 
-export default Notification
+const Notification = () => {
+  const dispatch = useDispatch();
+  const notification = useSelector((state) => state.notification);
+  const style = {
+    border: "solid",
+    padding: 10,
+    borderWidth: 1,
+  };
+
+  useEffect(() => {
+    if (notification) {
+      setTimeout(() => dispatch(removeNotification()), 5000);
+    }
+  }, [notification, dispatch]);
+
+  return Boolean(notification) ? (
+    <div style={style}>{notification}</div>
+  ) : (
+    <></>
+  );
+};
+
+export default Notification;
