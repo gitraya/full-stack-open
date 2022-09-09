@@ -17,8 +17,14 @@ export const initializeLoginUser = () => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      dispatch(setUser(user));
-      blogService.setToken(user.token);
+      const decodedJwt = JSON.parse(atob(user.token.split(".")[1]));
+
+      if (decodedJwt.exp * 1000 < Date.now()) {
+        dispatch(logoutUser());
+      } else {
+        dispatch(setUser(user));
+        blogService.setToken(user.token);
+      }
     }
   };
 };
