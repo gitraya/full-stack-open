@@ -78,6 +78,15 @@ const BlogDetail = () => {
     }
   };
 
+  const handleComment = (event) => {
+    event.preventDefault();
+
+    const comment = event.target.Comment.value;
+    event.target.Comment.value = "";
+
+    blogService.addComment(blog.id, comment).then((blog) => setBlog(blog));
+  };
+
   return (
     <>
       <h2>
@@ -97,6 +106,20 @@ const BlogDetail = () => {
         </span>
         <span>added by {blog.user.name}</span>
       </div>
+
+      <h3>comments</h3>
+
+      <form onSubmit={handleComment}>
+        <input required type="text" name="Comment" placeholder="comment" />
+        <button type="submit">add comment</button>
+      </form>
+
+      {!blog.comments?.length && <p>no comments</p>}
+      <ul>
+        {blog.comments?.map((comment, index) => (
+          <li key={index}>{comment}</li>
+        ))}
+      </ul>
     </>
   );
 };
