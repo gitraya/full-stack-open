@@ -17,9 +17,11 @@ const BlogList = () => {
           onCreateSuccess={() => blogFormRef.current.toggleVisibility()}
         />
       </Togglable>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+      <div className="flex flex-col gap-2 my-6">
+        {blogs.map((blog) => (
+          <Blog key={blog.id} blog={blog} />
+        ))}
+      </div>
     </>
   );
 };

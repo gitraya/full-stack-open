@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import userService from "../services/users";
 
 const UserDetail = () => {
@@ -16,11 +16,18 @@ const UserDetail = () => {
 
   return (
     <>
-      <h2>{user.name}</h2>
-      <h3>added blogs</h3>
-      <ul>
+      <h2 className="text-2xl mb-4">{user.name}</h2>
+      <h3 className="text-lg mb-4">added blogs</h3>
+      <ul className="list-disc pl-9">
         {user.blogs?.map((blog) => (
-          <li key={blog.id}>{blog.title}</li>
+          <li key={blog.id}>
+            <Link
+              to={`/blogs/${blog.id}`}
+              className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+            >
+              {blog.title}
+            </Link>
+          </li>
         ))}
       </ul>
     </>

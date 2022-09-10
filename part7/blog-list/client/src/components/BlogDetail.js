@@ -1,6 +1,7 @@
+import { Button, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { likeBlog, removeBlog } from "../reducers/blog";
 import { setNotification } from "../reducers/notification";
 import blogService from "../services/blogs";
@@ -22,16 +23,6 @@ const BlogDetail = () => {
 
   const isBlogOwned = user?.id === blog?.user?.id;
 
-  const removeStyle = {
-    backgroundColor: "red",
-    color: "white",
-    width: "min-content",
-  };
-  const parentDetailStyle = {
-    display: "flex",
-    flexDirection: "column",
-  };
-
   const handleLike = async () => {
     try {
       await dispatch(likeBlog(blog.id));
@@ -47,7 +38,7 @@ const BlogDetail = () => {
       dispatch(
         setNotification({
           message: `failed to like blog ${blog.title}`,
-          type: "error",
+          type: "failure",
         })
       );
     }
@@ -72,7 +63,7 @@ const BlogDetail = () => {
       dispatch(
         setNotification({
           message: `failed to remove blog ${blog.title}`,
-          type: "error",
+          type: "failure",
         })
       );
     }
@@ -85,37 +76,69 @@ const BlogDetail = () => {
     event.target.Comment.value = "";
 
     blogService.addComment(blog.id, comment).then((blog) => setBlog(blog));
+
+    dispatch(
+      setNotification({
+        message: `successfully added comment to blog ${blog.title}`,
+        type: "success",
+      })
+    );
   };
 
   return (
     <>
-      <h2>
+      <h2 className="text-2xl mb-5">
         {blog.title} {blog.author}
       </h2>
       {isBlogOwned && (
-        <button style={removeStyle} onClick={handleRemove}>
-          remove
-        </button>
+        <div className="mb-4">
+          <Button color="failure" onClick={handleRemove}>
+            Remove
+          </Button>
+        </div>
       )}
-      <div style={parentDetailStyle}>
-        <a href={blog.url} target="_blank" rel="noreferrer">
+      <div className="flex flex-col gap-1 mb-6">
+        <a
+          href={blog.url}
+          target="_blank"
+          rel="noreferrer"
+          className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+        >
           {blog.url}
         </a>
-        <span>
-          likes {blog.likes || "0"} <button onClick={handleLike}>like</button>
+        <span className="flex items-center gap-4">
+          likes {blog.likes || "0"}{" "}
+          <Button color="light" onClick={handleLike}>
+            Like
+          </Button>
         </span>
-        <span>added by {blog.user.name}</span>
+        <span>
+          added by{" "}
+          <Link
+            to={`/users/${blog.user.id}`}
+            className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+          >
+            {blog.user.name}
+          </Link>
+        </span>
       </div>
 
-      <h3>comments</h3>
+      <h3 className="text-xl mb-5">Comments</h3>
 
-      <form onSubmit={handleComment}>
-        <input required type="text" name="Comment" placeholder="comment" />
-        <button type="submit">add comment</button>
+      <form onSubmit={handleComment} className="flex gap-2 mb-5">
+        <TextInput
+          name="Comment"
+          type="text"
+          required={true}
+          placeholder="comment"
+        />
+        <Button color="light" type="submit">
+          Add Comment
+        </Button>
       </form>
 
       {!blog.comments?.length && <p>no comments</p>}
-      <ul>
+      <ul className="list-disc pl-9">
         {blog.comments?.map((comment, index) => (
           <li key={index}>{comment}</li>
         ))}

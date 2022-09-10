@@ -1,4 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from "react";
+import { Button } from "flowbite-react";
 import PropTypes from "prop-types";
 
 const Togglable = forwardRef((props, refs) => {
@@ -20,11 +21,15 @@ const Togglable = forwardRef((props, refs) => {
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+        <Button color="light" onClick={toggleVisibility}>
+          {props.buttonLabel}
+        </Button>
       </div>
       <div style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
+        <Button color="failure" onClick={toggleVisibility}>
+          Cancel
+        </Button>
       </div>
     </div>
   );

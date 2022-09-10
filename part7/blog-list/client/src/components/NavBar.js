@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Dropdown } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../reducers/user";
 
@@ -8,27 +9,18 @@ const NavBar = () => {
   const handleLogout = () => dispatch(logoutUser());
 
   return (
-    <nav
-      style={{
-        background: "lightgray",
-      }}
-    >
-      <ul
-        style={{
-          display: "flex",
-          gap: "10px",
-          listStyle: "none",
-          padding: "5px",
-        }}
-      >
+    <nav className="bg-blue-500 text-white">
+      <ul className="flex gap-4 list-none p-4 px-5 sm:px-10">
         <li>
-          <Link to="/">blogs</Link>
+          <Link to="/">Blogs</Link>
         </li>
         <li>
-          <Link to="/users">users</Link>
+          <Link to="/users">Users</Link>
         </li>
-        <li>
-          {user.name} logged in <button onClick={handleLogout}>logout</button>
+        <li className="ml-auto">
+          <Dropdown label={user.name} inline={true}>
+            <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+          </Dropdown>
         </li>
       </ul>
     </nav>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Table } from "flowbite-react";
 import userService from "../services/users";
 
 const UserList = () => {
@@ -11,27 +12,31 @@ const UserList = () => {
 
   return (
     <>
-      <h2>Users</h2>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>
-              <strong>blogs created</strong>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+      <h2 className="text-2xl mb-8">Users</h2>
+      <Table>
+        <Table.Head>
+          <Table.HeadCell>Name</Table.HeadCell>
+          <Table.HeadCell>Blogs Created</Table.HeadCell>
+        </Table.Head>
+        <Table.Body className="divide-y">
           {users.map((user) => (
-            <tr key={user.id}>
-              <td>
-                <Link to={`/users/${user.id}`}>{user.name}</Link>{" "}
-              </td>
-              <td>{user.blogs?.length}</td>
-            </tr>
+            <Table.Row
+              key={user.id}
+              className="bg-white dark:border-gray-700 dark:bg-gray-800"
+            >
+              <Table.Cell>
+                <Link
+                  to={`/users/${user.id}`}
+                  className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                >
+                  {user.name}
+                </Link>
+              </Table.Cell>
+              <Table.Cell>{user.blogs?.length}</Table.Cell>
+            </Table.Row>
           ))}
-        </tbody>
-      </table>
+        </Table.Body>
+      </Table>
     </>
   );
 };

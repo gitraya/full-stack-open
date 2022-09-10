@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { Alert } from "flowbite-react";
 
 const Notification = () => {
   const notification = useSelector((state) => state.notification);
@@ -8,9 +9,9 @@ const Notification = () => {
   }
 
   return (
-    <div className={`base-notification ${notification.type}`}>
-      {notification.message}
-    </div>
+    <Alert color={notification.type}>
+      <span>{notification.message}</span>
+    </Alert>
   );
 };
 

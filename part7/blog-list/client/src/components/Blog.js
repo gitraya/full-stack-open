@@ -1,25 +1,19 @@
+import { Card } from "flowbite-react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
 const Blog = ({ blog }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-    display: "flex",
-    flexDirection: "column",
-  };
-
   return (
-    <div data-testid="blog-card" style={blogStyle}>
-      <Link to={`/blogs/${blog.id}`}>
+    <Card>
+      <Link
+        to={`/blogs/${blog.id}`}
+        className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+      >
         <span>
           {blog.title} {blog.author}
         </span>
       </Link>
-    </div>
+    </Card>
   );
 };
 

@@ -26,9 +26,11 @@ const App = () => {
 
   if (!user) {
     return (
-      <div>
-        <h2>Log in to application</h2>
-        <Notification />
+      <div className="min-w-screen min-h-screen flex flex-col items-center">
+        <h2 className="text-3xl mb-8 mt-52">Log in to application</h2>
+        <div className="w-10/12 sm:w-1/2 lg:w-4/12 mb-5">
+          <Notification />
+        </div>
         <LoginForm />
       </div>
     );
@@ -37,15 +39,19 @@ const App = () => {
   return (
     <div>
       <NavBar />
-      <h2>blog app</h2>
-      <Notification />
+      <div className="flex flex-col p-10">
+        <h2 className="text-3xl capitalize m-auto mb-5">blog app</h2>
+        <div className="mb-5">
+          <Notification />
+        </div>
 
-      <Routes>
-        <Route path="/blogs/:id" element={<BlogDetail />} />
-        <Route path="/users/:id" element={<UserDetail />} />
-        <Route path="/users" element={<UserList />} />
-        <Route path="/" element={<BlogList />} />
-      </Routes>
+        <Routes>
+          <Route path="/blogs/:id" element={<BlogDetail />} />
+          <Route path="/users/:id" element={<UserDetail />} />
+          <Route path="/users" element={<UserList />} />
+          <Route path="/" element={<BlogList />} />
+        </Routes>
+      </div>
     </div>
   );
 };
